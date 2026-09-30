@@ -51,28 +51,6 @@ const homePath = getRelativeLocaleUrl(locale, "");
         />
         <span class="sr-only">RSS Feed</span>
       </a>
-
-      <p>
-        搞 LLM 推理引擎的，平时主要折腾算子优化和推理优化，以前做过计算机视觉。
-        这里放一些自己攒的笔记，踩过的坑也顺手记下来。
-      </p>
-      <p class="mt-2">
-        想看文章就翻{" "}
-        <LinkButton
-          class="hover:text-accent underline decoration-dashed underline-offset-4"
-          href={getRelativeLocaleUrl(locale, "posts")}
-        >
-          博客
-        </LinkButton>
-        ，代码在{" "}
-        <LinkButton
-          class="hover:text-accent underline decoration-dashed underline-offset-4"
-          href="https://github.com/duanyzhi"
-        >
-          GitHub
-        </LinkButton>
-        。
-      </p>
       {
         socials.length > 0 && (
           <div class="mt-4 flex max-sm:flex-col sm:items-center">
