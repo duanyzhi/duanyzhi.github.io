@@ -25,9 +25,7 @@ export default defineAstroPaperConfig({
     editPost: { enabled: false },
     search: "pagefind",
   },
-  socials: [
-    { name: "mail", url: "mailto:duanyzhi@outlook.com" },
-  ],
+  socials: [],
   shareLinks: [
     { name: "x", url: "https://x.com/intent/post?url=" },
     { name: "telegram", url: "https://t.me/share/url?url=" },
