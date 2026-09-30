@@ -26,7 +26,6 @@ export default defineAstroPaperConfig({
     search: "pagefind",
   },
   socials: [
-    { name: "github", url: "https://github.com/duanyzhi" },
     { name: "mail", url: "mailto:duanyzhi@outlook.com" },
   ],
   shareLinks: [

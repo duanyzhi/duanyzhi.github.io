@@ -178,12 +178,38 @@ const yearPercent = ((dayOfYear / daysThisYear) * 100).toFixed(1);
     };
   }
 
+  /** 算出距离时区里下一个零点还有多少毫秒。 */
+  function getMsUntilMidnight(timezone: string) {
+    const [hour, minute, second] = new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23",
+    })
+      .format(new Date())
+      .split(":")
+      .map(Number);
+    const elapsed = (hour * 3600 + minute * 60 + second) * 1000;
+    return MS_PER_DAY - elapsed + 1000;
+  }
+
+  let midnightTimer: number | undefined;
+
+  /** 页面一直开着也能跨天刷新，不用重新加载。 */
+  function scheduleMidnightRefresh(timezone: string) {
+    window.clearTimeout(midnightTimer);
+    midnightTimer = window.setTimeout(
+      () => renderYearProgress(),
+      getMsUntilMidnight(timezone)
+    );
+  }
+
   function renderYearProgress() {
     const root = document.querySelector<HTMLElement>("#year-progress");
     if (!root) return;
-    const { year, dayOfYear, daysLeft, percent } = getYearProgress(
-      root.dataset.timezone ?? "UTC"
-    );
+    const timezone = root.dataset.timezone ?? "UTC";
+    const { year, dayOfYear, daysLeft, percent } = getYearProgress(timezone);
     const fill = (key: string, value: string | number) => {
       const el = root.querySelector<HTMLElement>(`[data-${key}]`);
       if (el) el.textContent = String(value);
@@ -194,6 +220,7 @@ const yearPercent = ((dayOfYear / daysThisYear) * 100).toFixed(1);
     fill("percent", percent);
     const bar = root.querySelector<HTMLElement>("[data-bar]");
     if (bar) bar.style.width = `${percent}%`;
+    scheduleMidnightRefresh(timezone);
   }
 
   document.addEventListener("astro:page-load", () => {
@@ -201,8 +228,16 @@ const yearPercent = ((dayOfYear / daysThisYear) * 100).toFixed(1);
       ?.dataset;
     const baseRoot = import.meta.env.BASE_URL.replace(/\/?$/, "/");
     if (indexLayout?.layout) {
-      sessionStorage.setItem("backUrl", indexLayout.homePath ?? baseRoot);
+      try {
+        sessionStorage.setItem("backUrl", indexLayout.homePath ?? baseRoot);
+      } catch {
+        // 浏览器禁用存储时忽略，别影响天数渲染。
+      }
     }
     renderYearProgress();
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) renderYearProgress();
   });
 </script>
