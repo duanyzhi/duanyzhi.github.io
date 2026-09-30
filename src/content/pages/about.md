@@ -1,29 +1,21 @@
 ---
 title: "About"
-description: "关于 duanyzhi 和这个博客。"
+description: "About duanyzhi: an engineer working on LLM inference engines and computer vision."
 ---
 
-undergraduate: [HEU](http://www.hrbeu.edu.cn/)
+## Who I Am
 
-postgraduate: [UESTC](http://www.uestc.edu.cn/)
+I am an AI Infra Engineer at Infinigence-AI (无问芯穹), working on
+efficient LLM inference. Before Infinigence-AI, I was at DeepSight, Cambricon,
+and UISEE — and before that, @UESTC and @HEU.
 
-Intern company: [UISEE](https://www.uisee.com/)
+My main job is the LLM inference engine: LLM & AIGC inference, kernel
+optimization, agentic infra, and everything that makes a model actually run
+fast on real hardware. Along the way I have worked on computer vision — feature
+matching, morphology, and camera calibration.
 
-First Job: [Cambricon](http://www.cambricon.com/)
+## Contact
 
-## More Information
-
-I am currently a graduate student.
-
-The research direction is Deep Learning (Computer vision).
-
-now develop pytorch mlu framework in cambricon.
-
-- 博客：[CSDN](http://blog.csdn.net/md2017)
-- 知乎：[duanyzhi](https://www.zhihu.com/people/duanyzhi/activities)
-
-If you find something wrong in my blog, please contact me. Thx!
-
-## Contact me
-
-[duanyzhi@outlook.com](mailto:duanyzhi@outlook.com)
+- Blog: [CSDN](http://blog.csdn.net/md2017)
+- Zhihu: [duanyzhi](https://www.zhihu.com/people/duanyzhi/activities)
+- Email: [duanyzhi@outlook.com](mailto:duanyzhi@outlook.com)
