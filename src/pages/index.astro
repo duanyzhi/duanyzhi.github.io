@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import { getRelativeLocaleUrl } from "astro:i18n";
+import dayjs from "dayjs";
 import IconRss from "@/assets/icons/IconRss.svg";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import Layout from "@/layouts/Layout.astro";
@@ -23,6 +24,34 @@ const sortedPosts = getSortedPosts(posts);
 const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
 const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 const homePath = getRelativeLocaleUrl(locale, "");
+const timezone = config.site.timezone;
+
+const latestPost = sortedPosts[0];
+const lastUpdated = latestPost
+  ? dayjs(latestPost.data.modDatetime ?? latestPost.data.pubDatetime).format(
+      "YYYY-MM-DD"
+    )
+  : "—";
+
+const MS_PER_DAY = 86_400_000;
+const today = new Intl.DateTimeFormat("en-CA", {
+  timeZone: timezone,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+})
+  .format(new Date())
+  .split("-")
+  .map(Number);
+const [year, month, day] = today;
+const startOfYear = Date.UTC(year, 0, 1);
+const daysThisYear = Math.round(
+  (Date.UTC(year + 1, 0, 1) - startOfYear) / MS_PER_DAY
+);
+const dayOfYear =
+  Math.round((Date.UTC(year, month - 1, day) - startOfYear) / MS_PER_DAY) + 1;
+const daysLeft = daysThisYear - dayOfYear;
+const yearPercent = ((dayOfYear / daysThisYear) * 100).toFixed(1);
 ---
 
 <Layout>
@@ -34,13 +63,33 @@ const homePath = getRelativeLocaleUrl(locale, "");
     class="app-layout my-1"
   >
     <section id="hero" class="border-border border-b pt-8 pb-6">
-      <h1 class="my-4 inline-block text-4xl font-bold sm:my-8 sm:text-5xl">
-        Hi, I'm duanyzhi
-      </h1>
+      <h1 class="sr-only">duanyzhi 的博客</h1>
+      <div id="year-progress" data-timezone={timezone}>
+        <p class="text-lg sm:text-xl">
+          <span class="text-accent font-semibold" data-year>{year}</span>
+          年已经过了
+          <span class="text-accent font-semibold" data-day>{dayOfYear}</span>
+          天，还剩 <span class="text-accent font-semibold" data-left
+            >{daysLeft}</span
+          > 天
+        </p>
+        <div class="bg-muted mt-3 h-2 w-full overflow-hidden rounded-full">
+          <div
+            class="bg-accent h-full rounded-full transition-all duration-700"
+            style={`width: ${yearPercent}%`}
+            data-bar
+          >
+          </div>
+        </div>
+        <p class="text-muted-foreground mt-2 text-sm">
+          <span data-percent>{yearPercent}</span>% · 写了 {posts.length} 篇 · 最近更新
+          {lastUpdated}
+        </p>
+      </div>
       <a
         target="_blank"
         href={`${import.meta.env.BASE_URL.replace(/\/?$/, "/")}rss.xml`}
-        class="inline-block"
+        class="mt-4 inline-block"
         aria-label="RSS Feed"
         title="RSS Feed"
       >
@@ -110,6 +159,52 @@ const homePath = getRelativeLocaleUrl(locale, "");
 </Layout>
 
 <script>
+  const MS_PER_DAY = 86_400_000;
+
+  function getYearProgress(timezone: string) {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
+      .format(new Date())
+      .split("-")
+      .map(Number);
+    const [year, month, day] = parts;
+    const startOfYear = Date.UTC(year, 0, 1);
+    const daysThisYear = Math.round(
+      (Date.UTC(year + 1, 0, 1) - startOfYear) / MS_PER_DAY
+    );
+    const dayOfYear =
+      Math.round((Date.UTC(year, month - 1, day) - startOfYear) / MS_PER_DAY) +
+      1;
+    return {
+      year,
+      dayOfYear,
+      daysLeft: daysThisYear - dayOfYear,
+      percent: ((dayOfYear / daysThisYear) * 100).toFixed(1),
+    };
+  }
+
+  function renderYearProgress() {
+    const root = document.querySelector<HTMLElement>("#year-progress");
+    if (!root) return;
+    const { year, dayOfYear, daysLeft, percent } = getYearProgress(
+      root.dataset.timezone ?? "UTC"
+    );
+    const fill = (key: string, value: string | number) => {
+      const el = root.querySelector<HTMLElement>(`[data-${key}]`);
+      if (el) el.textContent = String(value);
+    };
+    fill("year", year);
+    fill("day", dayOfYear);
+    fill("left", daysLeft);
+    fill("percent", percent);
+    const bar = root.querySelector<HTMLElement>("[data-bar]");
+    if (bar) bar.style.width = `${percent}%`;
+  }
+
   document.addEventListener("astro:page-load", () => {
     const indexLayout = (document.querySelector("#main-content") as HTMLElement)
       ?.dataset;
@@ -117,5 +212,6 @@ const homePath = getRelativeLocaleUrl(locale, "");
     if (indexLayout?.layout) {
       sessionStorage.setItem("backUrl", indexLayout.homePath ?? baseRoot);
     }
+    renderYearProgress();
   });
 </script>
