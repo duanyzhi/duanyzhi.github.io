@@ -1,7 +1,6 @@
 ---
 import { getCollection } from "astro:content";
 import { getRelativeLocaleUrl } from "astro:i18n";
-import dayjs from "dayjs";
 import IconRss from "@/assets/icons/IconRss.svg";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import Layout from "@/layouts/Layout.astro";
@@ -25,13 +24,6 @@ const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
 const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 const homePath = getRelativeLocaleUrl(locale, "");
 const timezone = config.site.timezone;
-
-const latestPost = sortedPosts[0];
-const lastUpdated = latestPost
-  ? dayjs(latestPost.data.modDatetime ?? latestPost.data.pubDatetime).format(
-      "YYYY-MM-DD"
-    )
-  : "—";
 
 const MS_PER_DAY = 86_400_000;
 const today = new Intl.DateTimeFormat("en-CA", {
@@ -81,9 +73,8 @@ const yearPercent = ((dayOfYear / daysThisYear) * 100).toFixed(1);
           >
           </div>
         </div>
-        <p class="text-muted-foreground mt-2 text-sm">
-          <span data-percent>{yearPercent}</span>% · 写了 {posts.length} 篇 · 最近更新
-          {lastUpdated}
+        <p class="text-muted-foreground mt-2 text-right text-sm">
+          <span data-percent>{yearPercent}</span>%
         </p>
       </div>
       <a
